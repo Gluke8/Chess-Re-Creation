@@ -1,0 +1,14 @@
+C:\Users\Luke Vandergeer\Documents\GitHub\Chess-ReCreate\bin\Debug\net8.0\Chess-ReCreate.exe
+C:\Users\Luke Vandergeer\Documents\GitHub\Chess-ReCreate\bin\Debug\net8.0\Chess-ReCreate.deps.json
+C:\Users\Luke Vandergeer\Documents\GitHub\Chess-ReCreate\bin\Debug\net8.0\Chess-ReCreate.runtimeconfig.json
+C:\Users\Luke Vandergeer\Documents\GitHub\Chess-ReCreate\bin\Debug\net8.0\Chess-ReCreate.dll
+C:\Users\Luke Vandergeer\Documents\GitHub\Chess-ReCreate\bin\Debug\net8.0\Chess-ReCreate.pdb
+C:\Users\Luke Vandergeer\Documents\GitHub\Chess-ReCreate\obj\Debug\net8.0\Chess-ReCreate.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Luke Vandergeer\Documents\GitHub\Chess-ReCreate\obj\Debug\net8.0\Chess-ReCreate.AssemblyInfoInputs.cache
+C:\Users\Luke Vandergeer\Documents\GitHub\Chess-ReCreate\obj\Debug\net8.0\Chess-ReCreate.AssemblyInfo.cs
+C:\Users\Luke Vandergeer\Documents\GitHub\Chess-ReCreate\obj\Debug\net8.0\Chess-ReCreate.csproj.CoreCompileInputs.cache
+C:\Users\Luke Vandergeer\Documents\GitHub\Chess-ReCreate\obj\Debug\net8.0\Chess-ReCreate.dll
+C:\Users\Luke Vandergeer\Documents\GitHub\Chess-ReCreate\obj\Debug\net8.0\refint\Chess-ReCreate.dll
+C:\Users\Luke Vandergeer\Documents\GitHub\Chess-ReCreate\obj\Debug\net8.0\Chess-ReCreate.pdb
+C:\Users\Luke Vandergeer\Documents\GitHub\Chess-ReCreate\obj\Debug\net8.0\Chess-ReCreate.genruntimeconfig.cache
+C:\Users\Luke Vandergeer\Documents\GitHub\Chess-ReCreate\obj\Debug\net8.0\ref\Chess-ReCreate.dll
