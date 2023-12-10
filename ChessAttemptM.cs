@@ -3,6 +3,29 @@
 string[,] board = new string[8, 8];
 bool player = true;
 string[] letters = { "a", "b", "c", "d", "e", "f", "g", "h" };
+
+
+string[,] boardA = new string[8, 8];
+
+string scroll = "";
+const string boardDoc = "board.csv";
+StreamReader sr = new StreamReader(boardDoc);
+
+for (int i = 0; i < 8; i++)
+{
+    scroll = sr.ReadLine();
+    string[] boardB = scroll.Split(",");
+
+    for (int j = 0; j < 8; j++)
+    {
+        boardA[i, j] = boardB[j];
+    }
+}
+
+
+
+
+
 void Letter()
 {
     Console.WriteLine();
@@ -63,36 +86,46 @@ void print()
     Letter();
 }
 string sel = "";
-
+string spot(string here)
+{
+    for (int i = 0; i < 8; i++)
+    {
+        for (int j = 0; j < 8; j++)
+        {
+            if (boardA[i, j] == here)
+            {
+                Piece(i,j);
+            }
+        }
+    }
+    move(turn());
+    return "";
+}
 void move(string who)
 {
-    System.Console.WriteLine();
-    System.Console.WriteLine("Player " + who + " select who to move.");
+    Console.WriteLine();
+    Console.WriteLine("Player " + who + " select who to move. 'a1' for example.");
     sel = Console.ReadLine();
-    
-    
-    
-    if (sel.Contains(who))
-    {
+    string sel2 = spot(sel);
 
-    }
-    else
-    {
-        move(who);
-    }
+    player = false;
+
 }
-void turn()
+string turn()
 {
     if (player)
     {
-        move("1");
-        player = false;
+        return "1";
 
     }
     else
     {
-        move("2");
-        player = true;
+        return "2";
+    }
+}
+void Piece(int one, int two){
+    if (board[one,two].Contains(turn())){
+        System.Console.WriteLine("Success!");
     }
 }
 
@@ -127,8 +160,10 @@ void Start()
 }
 
 
-
-
 Start();
 print();
-turn();
+move(turn());
+
+
+
+

@@ -12,3 +12,4 @@ C:\Users\Luke Vandergeer\Documents\GitHub\Chess-ReCreate\obj\Debug\net8.0\refint
 C:\Users\Luke Vandergeer\Documents\GitHub\Chess-ReCreate\obj\Debug\net8.0\Chess-ReCreate.pdb
 C:\Users\Luke Vandergeer\Documents\GitHub\Chess-ReCreate\obj\Debug\net8.0\Chess-ReCreate.genruntimeconfig.cache
 C:\Users\Luke Vandergeer\Documents\GitHub\Chess-ReCreate\obj\Debug\net8.0\ref\Chess-ReCreate.dll
+C:\Users\Luke Vandergeer\Documents\GitHub\Chess-ReCreate\obj\Debug\net8.0\Chess-ReCreate.sourcelink.json
