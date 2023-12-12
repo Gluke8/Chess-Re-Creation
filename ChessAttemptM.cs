@@ -1,9 +1,11 @@
 ﻿//WIP making chess, previous code I will be working on in the near future
-//So I made it as a repo
+//So I made it as a repo, may convert to kotlin
+using System.Text;
+
 string[,] board = new string[8, 8];
 bool player = true;
 string[] letters = { "a", "b", "c", "d", "e", "f", "g", "h" };
-
+int newInt = 1;
 
 string[,] boardA = new string[8, 8];
 
@@ -22,10 +24,6 @@ for (int i = 0; i < 8; i++)
     }
 }
 
-
-
-
-
 void Letter()
 {
     Console.WriteLine();
@@ -38,36 +36,9 @@ void Letter()
 
 for (int i = 0; i < 8; i++)
 {
-    Console.WriteLine();
-    //System.Console.Write(i + 1 + " ");
     for (int j = 0; j < 8; j++)
     {
-        if (i % 2 == 1)
-        {
-            if (j % 2 == 0 && i % 2 == 1)
-            {
-                board[i, j] = "O  ";
-                Console.Write(board[i, j]);
-            }
-            else
-            {
-                board[i, j] = "-  ";
-                Console.Write(board[i, j]);
-            }
-        }
-        else
-        {
-            if (j % 2 == 1 && i % 2 == 0)
-            {
-                board[i, j] = "O  ";
-                Console.Write(board[i, j]);
-            }
-            else
-            {
-                board[i, j] = "-  ";
-                Console.Write(board[i, j]);
-            }
-        }
+        board[i,j] = Replace(i,j);
     }
 }
 
@@ -108,7 +79,7 @@ void move(string who)
     sel = Console.ReadLine();
     string sel2 = spot(sel);
 
-    player = false;
+    
 
 }
 string turn()
@@ -123,9 +94,32 @@ string turn()
         return "2";
     }
 }
+int temp = 0;
+int temp2 = 0;
+string newTemp2 = "";
+
 void Piece(int one, int two){
-    if (board[one,two].Contains(turn())){
-        System.Console.WriteLine("Success!");
+
+    if (board[one,two].Contains(turn()) && newInt != 0){
+        temp = one; temp2 = two;
+        move2(one, two);
+
+    }
+    else if ( newInt == 0 && player == true){
+        newTemp2 = board[one,two];
+        board[one,two] = board[temp,temp2];
+        board[temp,temp2] = Replace(temp, temp2);
+        print();
+        newInt = 1;
+        player = false;
+    }
+    else if ( newInt == 0 && player == false){
+        newTemp2 = board[one,two];
+        board[one,two] = board[temp,temp2];
+        board[temp,temp2] = Replace(temp, temp2);
+        print();
+        newInt = 1;
+        player = true;
     }
 }
 
@@ -159,6 +153,39 @@ void Start()
 
 }
 
+string newTemp = "";
+
+void move2(int one, int two) {
+    newInt = 0;
+    System.Console.WriteLine("Move to where? Use coordinate system.");
+    newTemp = Console.ReadLine();
+    spot(newTemp);
+
+}
+string Replace(int spot1, int spot2){
+    if (spot1 % 2 == 1)
+        {
+            if (spot2 % 2 == 0 && spot1 % 2 == 1)
+            {
+                return "O  ";
+            }
+            else
+            {
+                return "-  ";
+            }
+        }
+        else
+        {
+            if (spot2 % 2 == 1 && spot1 % 2 == 0)
+            {
+                return "O  ";
+            }
+            else
+            {
+                return "-  ";
+            }
+        }
+}
 
 Start();
 print();
