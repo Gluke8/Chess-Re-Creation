@@ -1,87 +1,41 @@
-﻿//WIP making chess, previous code I will be working on in the near future
-//So I made it as a repo, may convert to kotlin
-using System.Text;
-
-string[,] board = new string[8, 8];
-bool player = true;
+﻿//WIP making chess, I will be working on in this in the near future
+//So, I made it as a repo, and may convert to kotlin
+string[,] board = new string[8, 8]; string[,] boardA = new string[8, 8]; // arrays
 string[] letters = { "a", "b", "c", "d", "e", "f", "g", "h" };
-int newInt = 1;
 
-string[,] boardA = new string[8, 8];
-
-string scroll = "";
-const string boardDoc = "board.csv";
+const string boardDoc = "board.csv";           //variables for reading "board.csv" values; accessing and reading
 StreamReader sr = new StreamReader(boardDoc);
+string scroll = "";
 
-for (int i = 0; i < 8; i++)
+bool player = true; //player true; player 1's turn, player false; player 2's turn
+int Phase = 1;  //Whilst phase == 1; character select to move, phase == 0; select to place
+
+int temp = 0;         //group of variables used to determine piece moves
+int temp2 = 0;
+string newTemp = "";
+
+////////////////////////////// METHODS //////////////////////////////
+
+void print() //interface
 {
-    scroll = sr.ReadLine();
-    string[] boardB = scroll.Split(",");
-
-    for (int j = 0; j < 8; j++)
-    {
-        boardA[i, j] = boardB[j];
-    }
-}
-
-void Letter()
-{
-    Console.WriteLine();
-    System.Console.Write("  ");
-    for (int l = 0; l < 8; l++)
-    {
-        Console.Write(letters[l] + "  ");
-    }
-}
-
-for (int i = 0; i < 8; i++)
-{
-    for (int j = 0; j < 8; j++)
-    {
-        board[i,j] = Replace(i,j);
-    }
-}
-
-System.Console.WriteLine();
-void print()
-{
+    Console.WriteLine("  ___________________________\n |                           |");
     for (int i = 0; i < 8; i++)
     {
-        System.Console.WriteLine();
-        System.Console.Write(i + 1 + " ");
+        Console.Write(i + 1 + "|  ");
         for (int j = 0; j < 8; j++)
         {
-            Console.Write(board[i, j]);
+                Console.Write(board[i, j]);
         }
+        Console.Write(" |\n");
     }
-    Letter();
-}
-string sel = "";
-string spot(string here)
-{
+    Console.WriteLine(" |___________________________|");
+    Console.Write("    ");
     for (int i = 0; i < 8; i++)
     {
-        for (int j = 0; j < 8; j++)
-        {
-            if (boardA[i, j] == here)
-            {
-                Piece(i,j);
-            }
-        }
+        Console.Write(letters[i] + "  ");
     }
-    move(turn());
-    return "";
 }
-void move(string who)
-{
-    Console.WriteLine();
-    Console.WriteLine("Player " + who + " select who to move. 'a1' for example.");
-    sel = Console.ReadLine();
-    string sel2 = spot(sel);
 
-    
-
-}
 string turn()
 {
     if (player)
@@ -94,103 +48,100 @@ string turn()
         return "2";
     }
 }
-int temp = 0;
-int temp2 = 0;
-string newTemp2 = "";
 
-void Piece(int one, int two){
-
-    if (board[one,two].Contains(turn()) && newInt != 0){
-        temp = one; temp2 = two;
-        move2(one, two);
-
-    }
-    else if ( newInt == 0 && player == true){
-        newTemp2 = board[one,two];
-        board[one,two] = board[temp,temp2];
-        board[temp,temp2] = Replace(temp, temp2);
-        print();
-        newInt = 1;
-        player = false;
-    }
-    else if ( newInt == 0 && player == false){
-        newTemp2 = board[one,two];
-        board[one,two] = board[temp,temp2];
-        board[temp,temp2] = Replace(temp, temp2);
-        print();
-        newInt = 1;
-        player = true;
-    }
+void move(string who)
+{
+    Console.WriteLine();
+    Console.WriteLine("\nPlayer " + who + " select who to move. 'a1' for example.");
+    string sel = Console.ReadLine();
+    spot(sel);
 }
 
-void Start()
+void spot(string here)
 {
     for (int i = 0; i < 8; i++)
     {
-        board[1, i] = "p2 ";
-    }
-    for (int i = 0; i < 8; i++)
-    {
-        board[6, i] = "p1 ";
-    }
-    board[0, 0] = "r2 ";
-    board[0, 1] = "k2 ";
-    board[0, 2] = "b2 ";
-    board[0, 3] = "q2 ";
-    board[0, 4] = "m2 ";
-    board[0, 5] = "b2 ";
-    board[0, 6] = "k2 ";
-    board[0, 7] = "r2 ";
-
-    board[7, 0] = "r1 ";
-    board[7, 1] = "k1 ";
-    board[7, 2] = "b1 ";
-    board[7, 3] = "q1 ";
-    board[7, 4] = "m1 ";
-    board[7, 5] = "b1 ";
-    board[7, 6] = "k1 ";
-    board[7, 7] = "r1 ";
-
-}
-
-string newTemp = "";
-
-void move2(int one, int two) {
-    newInt = 0;
-    System.Console.WriteLine("Move to where? Use coordinate system.");
-    newTemp = Console.ReadLine();
-    spot(newTemp);
-
-}
-string Replace(int spot1, int spot2){
-    if (spot1 % 2 == 1)
+        for (int j = 0; j < 8; j++)
         {
-            if (spot2 % 2 == 0 && spot1 % 2 == 1)
+            if (boardA[i, j] == here)
             {
-                return "O  ";
+                Piece(i, j);
             }
-            else
-            {
-                return "-  ";
-            }
+        }
+    }
+    move(turn());
+}
+
+void Piece(int one, int two)
+{
+
+    if (board[one, two].Contains(turn()) && Phase != 0)
+    {
+        temp = one; temp2 = two; Phase = 0;
+        Console.WriteLine("Move to where? Use coordinate system.");
+        newTemp = Console.ReadLine();
+        spot(newTemp);
+
+    }
+    else if (Phase == 0)
+    {
+        newTemp = board[one, two];
+        board[one, two] = board[temp, temp2];
+        board[temp, temp2] = Replace(temp, temp2);
+        print();
+        Phase = 1;
+        player = !player;
+    }
+}
+
+string Replace(int spot1, int spot2)  //tile replacer. 
+//Could use another array with original tile, but this is my legacy board creator system
+//Therefore, I'm keeping it in
+{
+    if (spot1 % 2 == 1)
+    {
+        if (spot2 % 2 == 0 && spot1 % 2 == 1)
+        {
+            return "o  ";
         }
         else
         {
-            if (spot2 % 2 == 1 && spot1 % 2 == 0)
-            {
-                return "O  ";
-            }
-            else
-            {
-                return "-  ";
-            }
+            return "-  ";
         }
+    }
+    else
+    {
+        if (spot2 % 2 == 1 && spot1 % 2 == 0)
+        {
+            return "o  ";
+        }
+        else
+        {
+            return "-  ";
+        }
+    }
 }
 
-Start();
+////////////////////////////// GAME //////////////////////////////
+
+//Initialize
+for (int i = 0; i < 16; i++)
+{
+    scroll = sr.ReadLine();
+    string[] boardB = scroll.Split(",");
+    for (int j = 0; j < 8; j++)
+    {
+        if (i < 8)
+        {
+            boardA[i, j] = boardB[j];
+        }
+        else
+        {
+            board[i - 8, j] = boardB[j];
+        }
+    }
+}
+
+//Start
 print();
 move(turn());
-
-
-
-
