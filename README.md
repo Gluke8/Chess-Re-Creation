@@ -1,2 +1,2 @@
 # Chess-ReCreate
- Simple self re creation of chess.
+ Simple self re-creation of chess.
