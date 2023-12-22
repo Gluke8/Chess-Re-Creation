@@ -1,5 +1,7 @@
 ﻿//WIP making chess, I will be working on in this in the near future
 //So, I made it as a repo, and may convert to kotlin
+using System.Runtime.CompilerServices;
+
 string[,] board = new string[8, 8]; string[,] boardA = new string[8, 8]; // arrays
 string[] letters = { "a", "b", "c", "d", "e", "f", "g", "h" };
 
@@ -91,6 +93,7 @@ void Piece(int one, int two)
         }
         else if (board[one, two].Contains('r'))
         {
+            rook(one,two);
             intermission(one,two);
         }
         else if (board[one, two].Contains('k'))
@@ -175,15 +178,43 @@ string Replace(int spot1, int spot2)  //tile replacer.
 
 void pawn(int tile1, int tile2)
 {
-    int mod1 = -1;
-    int mod2 = -2;
-    if (player == false)
+    int mod1 = 0, mod2 = 0;
+    
+    if (player == true)
+    {
+        mod1 = -1;
+        mod2 = -2;
+        if (tile1 != 6)
+        {
+            mod2 = 0;
+        }
+        
+    }
+    else
     {
         mod1 = 1;
         mod2 = 2;
+        if (tile1 != 1)
+        {
+            mod2 = 0;
+        }
     }
-    valid[tile1 + mod1, tile2] = true;
-    valid[tile1 + mod2, tile2] = true;
+
+    if (board[tile1 + mod1, tile2].Contains('1') || board[tile1 + mod1, tile2].Contains('2'))
+    {
+        valid[tile1 + mod1, tile2] = false;
+
+    }
+    else{
+        valid[tile1 + mod1, tile2] = true;
+        if (mod2 == 0){
+            valid[tile1 + mod2, tile2] = false;
+        }
+        else {
+            valid[tile1 + mod2, tile2] = true;
+        }
+    }
+
     if (tile2 < 7)
     {
         if (board[tile1 + mod1, tile2 + 1].Contains(opposer))
@@ -199,6 +230,89 @@ void pawn(int tile1, int tile2)
         }
     }
 }
+
+void rook(int one, int two){
+    int modN = one, modE = Math.Abs(two - 7), modS = Math.Abs(one - 7), modW = two;
+    for (int i = 0; i <= modN; i++)
+    {
+        if (board[one - i, two].Contains(turn())) {
+        break;
+        }
+        else if (board[one - i, two].Contains(opposer)){
+            valid[one - i, two] = true;
+            break;
+        }
+        else {
+            valid[one - i, two] = true;
+        }
+
+    }
+    for (int i = 0; i <= modE; i++)
+    {
+
+        if (board[one, two + i].Contains(turn())) {
+        break;
+        }
+        else if (board[one, two + i].Contains(opposer)){
+            valid[one, two + i] = true;
+            break;
+        }
+        else {
+            valid[one, two + i] = true;
+        }
+
+
+    }
+    for (int i = 0; i <= modS; i++)
+    {
+        
+
+        if (board[one + i, two].Contains(turn())) {
+        break;
+        }
+        else if (board[one + i, two].Contains(opposer)){
+            valid[one + i, two] = true;
+            break;
+        }
+        else {
+            valid[one + i, two] = true;
+        }
+
+    }
+    for (int i = 0; i <= modW; i++)
+    {
+        
+
+        if (board[one, two - i].Contains(turn())) {
+        break;
+        }
+        else if (board[one, two - i].Contains(opposer)){
+            valid[one, two - i] = true;
+            break;
+        }
+        else {
+            valid[one, two - i] = true;
+        }
+
+    }
+    valid[one,two] = false;
+    possible();
+}
+void possible(){
+    int reset = 0;
+    foreach (var item in valid)
+    {
+        if (item == false){
+            reset++;
+        }
+        if (reset == 64){
+            System.Console.WriteLine("No valid moves...");
+        move(turn());
+        }
+        
+    }
+}
+
 
 ////////////////////////////// GAME //////////////////////////////
 
