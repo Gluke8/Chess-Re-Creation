@@ -1,7 +1,5 @@
 ﻿//WIP making chess, I will be working on in this in the near future
 //So, I made it as a repo, and may convert to kotlin
-using System.Runtime.CompilerServices;
-
 string[,] board = new string[8, 8]; string[,] boardA = new string[8, 8]; // arrays
 string[] letters = { "a", "b", "c", "d", "e", "f", "g", "h" };
 
@@ -15,6 +13,7 @@ int Phase = 1;  //Whilst phase == 1; character select to move, phase == 0; selec
 int temp = 0;         //group of variables used to determine piece moves
 int temp2 = 0;
 string newTemp = "";
+int recursion = 1;
 
 bool[,] valid = new bool[8, 8];
 char opposer = '0';
@@ -89,28 +88,33 @@ void Piece(int one, int two)
         if (board[one, two].Contains('p'))
         {
             pawn(one, two);
-            intermission(one,two);
+            intermission(one, two);
         }
         else if (board[one, two].Contains('r'))
         {
-            rook(one,two);
-            intermission(one,two);
+            rook(one, two);
+            intermission(one, two);
         }
         else if (board[one, two].Contains('k'))
         {
-            intermission(one,two);
+            knight(one, two);
+            possible();
+            intermission(one, two);
         }
         else if (board[one, two].Contains('b'))
         {
-            intermission(one,two);
+            bishop(one, two);
+            intermission(one, two);
         }
         else if (board[one, two].Contains('q'))
         {
-            intermission(one,two);
+            rook(one, two);
+            bishop(one, two);
+            intermission(one, two);
         }
         else if (board[one, two].Contains('m'))
         {
-            intermission(one,two);
+            intermission(one, two);
         }
 
 
@@ -141,11 +145,12 @@ void Piece(int one, int two)
     }
 }
 
-void intermission(int one, int two){
-    temp = one; temp2 = two; Phase = 0;
-            Console.WriteLine("Move to where? Use coordinate system.");
-            newTemp = Console.ReadLine();
-            spot(newTemp);
+void intermission(int one, int two)
+{
+    temp = one; temp2 = two; Phase = 0; recursion = 1;
+    Console.WriteLine("Move to where? Use coordinate system.");
+    newTemp = Console.ReadLine();
+    spot(newTemp);
 }
 
 string Replace(int spot1, int spot2)  //tile replacer. 
@@ -179,7 +184,7 @@ string Replace(int spot1, int spot2)  //tile replacer.
 void pawn(int tile1, int tile2)
 {
     int mod1 = 0, mod2 = 0;
-    
+
     if (player == true)
     {
         mod1 = -1;
@@ -188,7 +193,7 @@ void pawn(int tile1, int tile2)
         {
             mod2 = 0;
         }
-        
+
     }
     else
     {
@@ -205,12 +210,15 @@ void pawn(int tile1, int tile2)
         valid[tile1 + mod1, tile2] = false;
 
     }
-    else{
+    else
+    {
         valid[tile1 + mod1, tile2] = true;
-        if (mod2 == 0){
+        if (mod2 == 0)
+        {
             valid[tile1 + mod2, tile2] = false;
         }
-        else {
+        else
+        {
             valid[tile1 + mod2, tile2] = true;
         }
     }
@@ -229,87 +237,226 @@ void pawn(int tile1, int tile2)
             valid[tile1 + mod1, tile2 - 1] = true;
         }
     }
-}
-
-void rook(int one, int two){
-    int modN = one, modE = Math.Abs(two - 7), modS = Math.Abs(one - 7), modW = two;
-    for (int i = 0; i <= modN; i++)
-    {
-        if (board[one - i, two].Contains(turn())) {
-        break;
-        }
-        else if (board[one - i, two].Contains(opposer)){
-            valid[one - i, two] = true;
-            break;
-        }
-        else {
-            valid[one - i, two] = true;
-        }
-
-    }
-    for (int i = 0; i <= modE; i++)
-    {
-
-        if (board[one, two + i].Contains(turn())) {
-        break;
-        }
-        else if (board[one, two + i].Contains(opposer)){
-            valid[one, two + i] = true;
-            break;
-        }
-        else {
-            valid[one, two + i] = true;
-        }
-
-
-    }
-    for (int i = 0; i <= modS; i++)
-    {
-        
-
-        if (board[one + i, two].Contains(turn())) {
-        break;
-        }
-        else if (board[one + i, two].Contains(opposer)){
-            valid[one + i, two] = true;
-            break;
-        }
-        else {
-            valid[one + i, two] = true;
-        }
-
-    }
-    for (int i = 0; i <= modW; i++)
-    {
-        
-
-        if (board[one, two - i].Contains(turn())) {
-        break;
-        }
-        else if (board[one, two - i].Contains(opposer)){
-            valid[one, two - i] = true;
-            break;
-        }
-        else {
-            valid[one, two - i] = true;
-        }
-
-    }
-    valid[one,two] = false;
     possible();
 }
-void possible(){
+
+void rook(int one, int two)
+{
+    int modN = one, modE = Math.Abs(two - 7), modS = Math.Abs(one - 7), modW = two;
+    for (int i = 1; i <= modN; i++)
+    {
+        if (board[one - i, two].Contains(turn()))
+        {
+            break;
+        }
+        else if (board[one - i, two].Contains(opposer))
+        {
+            valid[one - i, two] = true;
+            break;
+        }
+        else
+        {
+            valid[one - i, two] = true;
+        }
+
+    }
+    for (int i = 1; i <= modE; i++)
+    {
+
+        if (board[one, two + i].Contains(turn()))
+        {
+            break;
+        }
+        else if (board[one, two + i].Contains(opposer))
+        {
+            valid[one, two + i] = true;
+            break;
+        }
+        else
+        {
+            valid[one, two + i] = true;
+        }
+
+
+    }
+    for (int i = 1; i <= modS; i++)
+    {
+
+
+        if (board[one + i, two].Contains(turn()))
+        {
+            break;
+        }
+        else if (board[one + i, two].Contains(opposer))
+        {
+            valid[one + i, two] = true;
+            break;
+        }
+        else
+        {
+            valid[one + i, two] = true;
+        }
+
+    }
+    for (int i = 1; i <= modW; i++)
+    {
+
+
+        if (board[one, two - i].Contains(turn()))
+        {
+            break;
+        }
+        else if (board[one, two - i].Contains(opposer))
+        {
+            valid[one, two - i] = true;
+            break;
+        }
+        else
+        {
+            valid[one, two - i] = true;
+        }
+
+    }
+    valid[one, two] = false;
+    possible();
+}
+
+
+void knight(int one, int two)
+{
+    while (recursion < 9)
+    {
+        try
+        {
+            switch (recursion)
+            {
+                case 1:
+                    valid[one + 2, two - 1] = true; check(one + 2, two - 1);
+                    break;
+                case 2:
+                    valid[one + 2, two + 1] = true; check(one + 2, two + 1);
+                    break;
+                case 3:
+                    valid[one - 2, two - 1] = true; check(one - 2, two - 1);
+                    break;
+                case 4:
+                    valid[one - 2, two + 1] = true; check(one - 2, two + 1);
+                    break;
+                case 5:
+                    valid[one + 1, two - 2] = true; check(one + 1, two - 2);
+                    break;
+                case 6:
+                    valid[one + 1, two + 2] = true; check(one + 1, two + 2);
+                    break;
+                case 7:
+                    valid[one - 1, two - 2] = true; check(one - 1, two - 2);
+                    break;
+                case 8:
+                    valid[one - 1, two + 2] = true; check(one - 1, two + 2);
+                    break;
+            }
+        }
+        catch (IndexOutOfRangeException)
+        {
+            recursion++;
+            knight(one, two);
+        }
+    }
+    
+}
+void check(int one, int two){
+    if (board[one, two].Contains(turn())){
+        valid[one,two] = false;
+    }
+    recursion++;
+}
+
+int modB1 = 0;
+
+void bishop(int one, int two){
+    
+    for (int i = 1; i <= Math.Abs(two - 7) || i > one; i++)
+    {
+        if (board[one - i, two + i].Contains(turn()))
+        {
+            break;
+        }
+        else if (board[one - i, two + i].Contains(opposer))
+        {
+            valid[one - i, two + i] = true;
+            break;
+        }
+        else
+        {
+            valid[one - i, two + i] = true;
+        }
+    }
+    for (int i = 1; i <= two || i > one; i++)
+    {
+        if (board[one - i, two - i].Contains(turn()))
+        {
+            break;
+        }
+        else if (board[one - i, two - i].Contains(opposer))
+        {
+            valid[one - i, two - i] = true;
+            break;
+        }
+        else
+        {
+            valid[one - i, two - i] = true;
+        }
+    }
+    for (int i = 1; i <= one || i > two; i++)
+    {
+        if (board[one + i, two + i].Contains(turn()))
+        {
+            break;
+        }
+        else if (board[one + i, two + i].Contains(opposer))
+        {
+            valid[one + i, two + i] = true;
+            break;
+        }
+        else
+        {
+            valid[one + i, two + i] = true;
+        }
+    }
+    for (int i = 1; i <= Math.Abs(one - 7) || i > two; i++)
+    {
+        if (board[one + i, two - i].Contains(turn()))
+        {
+            break;
+        }
+        else if (board[one + i, two - i].Contains(opposer))
+        {
+            valid[one + i, two - i] = true;
+            break;
+        }
+        else
+        {
+            valid[one + i, two - i] = true;
+        }
+    }
+    possible();
+}
+
+void possible()
+{
     int reset = 0;
     foreach (var item in valid)
     {
-        if (item == false){
+        if (item == false)
+        {
             reset++;
         }
-        if (reset == 64){
+        if (reset == 64)
+        {
             System.Console.WriteLine("No valid moves...");
-        move(turn());
+            move(turn());
         }
-        
+
     }
 }
 
@@ -334,7 +481,7 @@ for (int i = 0; i < 16; i++)
     }
 }
 
-//Start
+//Start ( begin the recursion )
 print();
 move(turn());
 
