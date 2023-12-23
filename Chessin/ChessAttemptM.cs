@@ -18,6 +18,7 @@ int recursion = 1;
 bool[,] valid = new bool[8, 8];
 char opposer = '0';
 
+int rook11,rook12,king1,king2,rook22,rook21;
 
 
 ////////////////////////////// METHODS //////////////////////////////
@@ -114,6 +115,8 @@ void Piece(int one, int two)
         }
         else if (board[one, two].Contains('m'))
         {
+            master(one,two);
+            possible();
             intermission(one, two);
         }
 
@@ -440,6 +443,47 @@ void bishop(int one, int two){
         }
     }
     possible();
+}
+
+void master(int one, int two){
+    while (recursion < 9)
+    {
+        try
+        {
+            switch (recursion)
+            {
+                case 1:
+                    valid[one + 1, two] = true; check(one + 1, two);
+                    break;
+                case 2:
+                    valid[one - 1, two] = true; check(one - 1, two);
+                    break;
+                case 3:
+                    valid[one, two - 1] = true; check(one, two - 1);
+                    break;
+                case 4:
+                    valid[one, two + 1] = true; check(one, two + 1);
+                    break;
+                case 5:
+                    valid[one + 1, two + 1] = true; check(one + 1, two +1);
+                    break;
+                case 6:
+                    valid[one + 1, two - 1] = true; check(one + 1, two - 1);
+                    break;
+                case 7:
+                    valid[one - 1, two - 1] = true; check(one - 1, two - 1);
+                    break;
+                case 8:
+                    valid[one - 1, two + 1] = true; check(one - 1, two + 1);
+                    break;
+            }
+        }
+        catch (IndexOutOfRangeException)
+        {
+            recursion++;
+            master(one, two);
+        }
+    }
 }
 
 void possible()
