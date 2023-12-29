@@ -7,10 +7,10 @@ a6,b6,c6,d6,e6,f6,g6,h6
 a7,b7,c7,d7,e7,f7,g7,h7
 a8,b8,c8,d8,e8,f8,g8,h8
 r2 ,k2 ,b2 ,q2 ,m2 ,b2 ,k2 ,r2 
-p2 ,p2 ,p2 ,p2 ,p2 ,p2 ,p2 ,p2 
+p2 ,p2 ,p2 ,p2 ,o  ,p2 ,p2 ,p2 
 -  ,o  ,-  ,o  ,-  ,o  ,-  ,o  
 o  ,-  ,o  ,-  ,o  ,-  ,o  ,-  
--  ,o  ,-  ,o  ,m1  ,o  ,-  ,o  
+-  ,o  ,-  ,o  ,q1  ,o  ,-  ,o  
 o  ,-  ,o  ,-  ,o  ,-  ,o  ,-  
 p1 ,p1 ,p1 ,p1 ,p1 ,p1 ,p1 ,p1 
 r1 ,k1 ,b1 ,q1 ,m1 ,b1 ,k1 ,r1 
