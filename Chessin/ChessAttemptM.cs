@@ -1,5 +1,7 @@
 ﻿//WIP making chess, I will be working on in this in the near future
 //So, I made it as a repo, and may convert to kotlin
+using System.Data.SqlTypes;
+
 string[,] board = new string[8, 8]; string[,] boardA = new string[8, 8]; // arrays
 string[] letters = { "a", "b", "c", "d", "e", "f", "g", "h" };
 
@@ -16,6 +18,7 @@ string newTemp = "";
 int recursion = 1;
 
 bool[,] valid = new bool[8, 8];
+bool[,] kingValid = new bool[8, 8];
 char opposer = '0';
 
 int rook11, rook12, king1, king2, rook22, rook21; //castling
@@ -25,7 +28,10 @@ int mA = 0;
 int mB = 0;
 bool motion = true;
 bool contension = false;
-
+bool queen = false;
+bool king = false;
+bool phaseCheck = false;
+int temp3 = 0; int temp4 = 0;
 
 ////////////////////////////// METHODS //////////////////////////////
 
@@ -49,8 +55,18 @@ void print() //interface
     }
 }
 
+
+
 string turn()
 {
+    for (int i = 0; i < 8; i++)
+    {
+        for (int j = 0; j < 8; j++)
+        {
+            kingValid[i, j] = false;
+        }
+    }
+    Phase = 1;
     if (player)
     {
         opposer = '1';
@@ -74,53 +90,85 @@ string turn()
 
 
 
-void checkMate() // why no working
+void checkMate()
 {
     checkM = true;
     for (int i = 0; i < 8; i++)
     {
         for (int j = 0; j < 8; j++)
         {
-            if(board[i,j].Contains("p"+user)){ 
-                pawn(i,j);
+            if (board[i, j].Contains("p" + user))
+            {
+                pawn(i, j);
             }
-            if(board[i,j].Contains("r"+user)){ 
-                rook(i,j);
+            if (board[i, j].Contains("r" + user))
+            {
+                rook(i, j);
             }
-        
-            if(board[i,j].Contains("k"+user)){
-                knight(i,j);
+
+            if (board[i, j].Contains("k" + user))
+            {
+                knight(i, j);
                 recursion = 1;
             }
-            
-            if(board[i,j].Contains("q"+user)){
-                rook(i,j);
-                bishop(i,j);
+
+            if (board[i, j].Contains("q" + user))
+            {
+                rook(i, j);
+                bishop(i, j);
             }
-            
-            if(board[i,j].Contains("b"+user)){
-                bishop(i,j);
+
+            if (board[i, j].Contains("b" + user))
+            {
+                bishop(i, j);
             }
-            
-            if(board[i,j].Contains("m"+opposer)){
+
+            if (board[i, j].Contains("m" + opposer))
+            {
                 mA = i; mB = j;
             }
         }
     }
     checkM = false;
 
-    if (valid[mA,mB] == true){
-        System.Console.WriteLine("PROTECT");
+    if (valid[mA, mB] == true)
+    {
+        if (phaseCheck == true)
+        {
+            System.Console.WriteLine("\nYou are still under attack if you go there...");
+            contension = false;
+            phaseCheck = false;
+            for (int i = 0; i < 8; i++)
+            {
+                for (int j = 0; j < 8; j++)
+                {
+                    valid[i, j] = false;
+                }
+            }
+            board[temp, temp2] = board[temp3, temp4];
+            board[temp3, temp4] = Replace(temp3, temp4);
+            move(turn());
+        }
+        contension = true; // run sub paths in methods
+        Console.WriteLine("\nPROTECT");
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                kingValid[i, j] = valid[i, j];
+            }
+        }
     }
     for (int i = 0; i < 8; i++)
     {
         for (int j = 0; j < 8; j++)
         {
-            valid[i,j] = false;
+            valid[i, j] = false;
         }
     }
 
 }
+
 
 void move(string who)
 {
@@ -142,71 +190,105 @@ void spot(string here)
             }
         }
     }
-    //move(turn());
+    move(turn()); // if it breaks just go back to while loop continuation. I hope checkmate system works for both
 }
 
 void Piece(int one, int two)
 {
-
     if (board[one, two].Contains(user) && Phase != 0)
     {
         if (board[one, two].Contains('p'))
         {
             pawn(one, two);
-            if (checkM == false)
-            {
-                intermission(one, two);
-            }
+            intermission(one, two);
         }
         else if (board[one, two].Contains('r'))
         {
             rook(one, two);
-            if (checkM == false)
-            {
-                intermission(one, two);
-            }
+            intermission(one, two);
+
         }
         else if (board[one, two].Contains('k'))
         {
             knight(one, two);
-
-            if (checkM == false)
-            {
-                possible();
-                intermission(one, two);
-            }
+            possible();
+            intermission(one, two);
         }
         else if (board[one, two].Contains('b'))
         {
             bishop(one, two);
-            if (checkM == false)
-            {
-                intermission(one, two);
-            }
+            intermission(one, two);
+
         }
         else if (board[one, two].Contains('q'))
         {
+            queen = true;
             rook(one, two);
             bishop(one, two);
-            if (checkM == false)
-            {
-                intermission(one, two);
-            }
+            possible();
+            intermission(one, two);
+
         }
         else if (board[one, two].Contains('m'))
         {
+            king = true;
             master(one, two);
-            if (checkM == false)
+            possible();
+            intermission(one, two);
+        }
+    }
+    if (contension && Phase != 3) // runs through again???
+    {
+
+        if (king == false)
+        {
+            if (valid[one, two] == true)
             {
-                possible();
-                intermission(one, two);
+                for (int i = 0; i < 8; i++)
+                {
+                    for (int j = 0; j < 8; j++)
+                    {
+                        valid[i, j] = false;
+                    }
+                }
+                temp3 = one; temp4 = two;
+                newTemp = board[one, two];
+                board[one, two] = board[temp, temp2];
+                board[temp, temp2] = Replace(temp, temp2);
+                if (user == "1")
+                {
+                    user = "2";
+                    opposer = '1';
+                }
+                else
+                {
+                    user = "1"; opposer = '2';
+                }
+                phaseCheck = true;
+                checkMate();
+                Phase = 1;
+                king = false;
             }
+            else
+            {
+                Phase = 1;
+                move(turn());
+            }
+        }
+        else if (valid[one, two] == true && kingValid[one, two] == true)
+        {
+            System.Console.WriteLine("You are still under attack if you go there...");
+            contension = false;
+            king = false;
+            Phase = 1;
+            move(turn());
         }
 
 
     }
-    else if (Phase == 0 && checkM == false)
+    if (Phase == 0 && checkM == false)
     {
+
         if (valid[one, two] == true)
         {
             for (int i = 0; i < 8; i++)
@@ -220,20 +302,22 @@ void Piece(int one, int two)
             board[one, two] = board[temp, temp2];
             board[temp, temp2] = Replace(temp, temp2);
             print();
+
             Phase = 1;
+            king = false;
             player = !player;
         }
         else
         {
             Phase = 1;
-            move(user);
+            move(turn());
         }
     }
 }
 
 void intermission(int one, int two)
 {
-    temp = one; temp2 = two; Phase = 0; recursion = 1;
+    temp = one; temp2 = two; Phase = 0; recursion = 1; queen = false;
     System.Console.WriteLine("Move to where? Use coordinate system.");
     newTemp = Console.ReadLine();
     spot(newTemp);
@@ -247,22 +331,22 @@ string Replace(int spot1, int spot2)  //tile replacer.
     {
         if (spot2 % 2 == 0 && spot1 % 2 == 1)
         {
-            return "o  ";
+            return "■  ";
         }
         else
         {
-            return "-  ";
+            return "O  ";
         }
     }
     else
     {
         if (spot2 % 2 == 1 && spot1 % 2 == 0)
         {
-            return "o  ";
+            return "■  ";
         }
         else
         {
-            return "-  ";
+            return "O  ";
         }
     }
 }
@@ -289,8 +373,8 @@ void pawn(int tile1, int tile2)
             mod2 = 0;
         }
     }
-    
-    if (checkM == true) // broken for player 2--------------------------------------------------------------
+
+    if (checkM == true)
     {
         if (user == "2")
         {
@@ -431,7 +515,7 @@ void rook(int one, int two)
 
     }
     valid[one, two] = false;
-    if (checkM == false)
+    if (checkM == false && !queen)
     {
         possible();
     }
@@ -493,15 +577,17 @@ int restD = 0;
 int restR = 0;
 int rest = 0;
 
-void bishop(int one, int two) 
+void bishop(int one, int two)
 {
     restD = 7 - one;
     restR = 7 - two;
 
-    if (restD > restR){
+    if (restD > restR)
+    {
         rest = restR;
     }
-    else{
+    else
+    {
         rest = restD;
     }
 
@@ -522,10 +608,12 @@ void bishop(int one, int two)
         }
     }
 
-    if (restD > two){
+    if (restD > two)
+    {
         rest = two;
     }
-    else{
+    else
+    {
         rest = restD;
     }
 
@@ -546,10 +634,12 @@ void bishop(int one, int two)
         }
     }
 
-    if (one > two){
+    if (one > two)
+    {
         rest = two;
     }
-    else{
+    else
+    {
         rest = one;
     }
 
@@ -569,11 +659,13 @@ void bishop(int one, int two)
             valid[one - i, two - i] = true;
         }
     }
-    
-    if (one > restR){
+
+    if (one > restR)
+    {
         rest = restR;
     }
-    else{
+    else
+    {
         rest = one;
     }
 
@@ -593,8 +685,8 @@ void bishop(int one, int two)
             valid[one - i, two + i] = true;
         }
     }
-    
-    if (checkM == false)
+
+    if (checkM == false && !queen)
     {
         possible();
     }
@@ -655,9 +747,10 @@ void possible()
     if (reset == 64)
     {
         Console.WriteLine("No valid moves...");
-        move(user);
+        queen = false;
+        move(turn());
     }
-    
+
 }
 
 
@@ -683,9 +776,6 @@ for (int i = 0; i < 16; i++)
 
 //Start ( begin the recursion )
 print();
-while (motion){
-    turn();
-    move(user);
-}
 
+move(turn());
 
