@@ -31,6 +31,7 @@ bool contension = false;
 bool queen = false;
 bool king = false;
 bool phaseCheck = false;
+bool pin = false;
 int temp3 = 0; int temp4 = 0;
 
 ////////////////////////////// METHODS //////////////////////////////
@@ -159,6 +160,7 @@ void checkMate()
             }
         }
     }
+
     for (int i = 0; i < 8; i++)
     {
         for (int j = 0; j < 8; j++)
@@ -267,6 +269,8 @@ void Piece(int one, int two)
                 phaseCheck = true;
                 checkMate();
                 Phase = 1;
+                print();
+                player = !player;
                 king = false;
             }
             else
@@ -280,7 +284,6 @@ void Piece(int one, int two)
             System.Console.WriteLine("You are still under attack if you go there...");
             contension = false;
             king = false;
-            Phase = 1;
             move(turn());
         }
 
@@ -288,8 +291,39 @@ void Piece(int one, int two)
     }
     if (Phase == 0 && checkM == false)
     {
+        //one for king movement pin check moving to spot where it should not. check.
+        if (king == true && valid[one, two] == true)
+        {
+            for (int i = 0; i < 8; i++)
+            {
+                for (int j = 0; j < 8; j++)
+                {
+                    valid[i, j] = false;
+                }
+            }
+            temp3 = one; temp4 = two;
+            newTemp = board[one, two];
+            board[one, two] = board[temp, temp2];
+            board[temp, temp2] = Replace(temp, temp2);
+            if (user == "1")
+            {
+                user = "2";
+                opposer = '1';
+            }
+            else
+            {
+                user = "1"; opposer = '2';
+            }
+            phaseCheck = true;
+            checkMate();
+            Phase = 1;
+            print();
+            player = !player;
+            king = false;
+        }
 
-        if (valid[one, two] == true)
+        // another for other pieces accidentally opening a path.
+        else if (valid[one, two] == true)
         {
             for (int i = 0; i < 8; i++)
             {
@@ -299,13 +333,24 @@ void Piece(int one, int two)
                 }
             }
             newTemp = board[one, two];
+            temp3 = one; temp4 = two;
             board[one, two] = board[temp, temp2];
             board[temp, temp2] = Replace(temp, temp2);
-            print();
-
+            if (user == "1")
+            {
+                user = "2";
+                opposer = '1';
+            }
+            else
+            {
+                user = "1"; opposer = '2';
+            }
+            phaseCheck = true;
+            checkMate();
             Phase = 1;
-            king = false;
+            print();
             player = !player;
+            king = false;
         }
         else
         {
