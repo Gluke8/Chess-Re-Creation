@@ -13,7 +13,8 @@ int Phase = 1;  //Whilst phase == 1; character select to move, phase == 0; selec
 int temp = 0;         //group of variables used to determine piece moves
 int temp2 = 0;
 string newTemp = "";
-int recursion = 1;
+
+int recursion = 1; // for switch cases
 
 bool[,] valid = new bool[8, 8];
 bool[,] kingValid = new bool[8, 8];
@@ -27,22 +28,21 @@ int mB = 0;
 bool contension = false;
 bool queen = false;
 bool king = false;
-bool phaseCheck = false;
 int temp3 = 0; int temp4 = 0;
 
 //en passent ------------------------ !THIS WILL BE THE HARDEST SYSTEM TO IMPLEMENT! ----------------------------------------------------
 
 // TO DO 
-// en passent, castling, check mate, stalemate, *rework of check available spot mehtod for most pieces.*
+// en passent, castling, check mate, stalemate,
 
 //castling ---------------------------------------------------------------------------------------------------------------------------------
 // work on one rook at a time
 // rook can not have moved -> DISTINGUISH BETWEEN ROOKS: 
-// selected tile must contain rook that see's king depending on which side for player tiles adjusted. depending on initial spot.
-// and bool for method caveat
+//  -> selected tile must contain rook that see's king depending on which side for player tiles adjusted. depending on initial spot.
+//  -> and bool for method caveat
 // king cannot have moved -> bool method caveat
 // king cannot be in check -> method caveat: if your king is in check
-// can't castle through a check -> if tile _ _ _ has one true, no castle 
+// can't castle through a check -> if tiles _ _ _ have one true, no castle 
 // no pieces in between -> rook must see king.
 
 // this will start after some organization.
@@ -114,7 +114,7 @@ void checkMate()
             }
             if (board[i, j].Contains("r" + user))
             {
-                rook(i, j);
+                Rook(i, j);
             }
 
             if (board[i, j].Contains("k" + user))
@@ -125,13 +125,13 @@ void checkMate()
 
             if (board[i, j].Contains("q" + user))
             {
-                rook(i, j);
-                bishop(i, j);
+                Rook(i, j);
+                Bishop(i, j);
             }
 
             if (board[i, j].Contains("b" + user))
             {
-                bishop(i, j);
+                Bishop(i, j);
             }
 
             if (board[i, j].Contains("m" + user))
@@ -150,11 +150,10 @@ void checkMate()
 
     if (valid[mA, mB] == true)
     {
-        if (phaseCheck == true && Phase == 0) // dont enter on next player's turn
+        if (Phase == 0) // dont enter on next player's turn
         {
             System.Console.WriteLine("\nYou are still under attack if you go there...");
             contension = false;
-            phaseCheck = false;
             board[temp, temp2] = board[temp3, temp4];
             board[temp3, temp4] = Replace(temp3, temp4);
             move(turn());
@@ -215,7 +214,7 @@ void Piece(int one, int two)
         }
         else if (board[one, two].Contains('r'))
         {
-            rook(one, two);
+            Rook(one, two);
             intermission(one, two);
 
         }
@@ -227,14 +226,16 @@ void Piece(int one, int two)
         }
         else if (board[one, two].Contains('b'))
         {
-            bishop(one, two);
+            
+            Bishop(one, two);
+
             intermission(one, two);
         }
         else if (board[one, two].Contains('q'))
         {
             queen = true;
-            rook(one, two);
-            bishop(one, two);
+            Rook(one, two);
+            Bishop(one, two);
             possible();
             intermission(one, two);
 
@@ -291,7 +292,6 @@ void endTurn(int one, int two)
         {
             user = "1"; opposer = '2';
         }
-        phaseCheck = true;
         checkMate();
         print();
         player = !player;
@@ -338,22 +338,21 @@ string Replace(int spot1, int spot2)  //tile replacer.
         }
     }
 }
+
 // PIECES -------------------------------------------------------------------------------------------------------
+
 void pawn(int tile1, int tile2)
 {
     int mod1, mod2;
-    if (player == true)
-    {
+    if (user == "1"){
         mod1 = -1;
         mod2 = -2;
         if (tile1 != 6)
         {
             mod2 = 0;
         }
-
     }
-    else
-    {
+    else {
         mod1 = 1;
         mod2 = 2;
         if (tile1 != 1)
@@ -362,33 +361,9 @@ void pawn(int tile1, int tile2)
         }
     }
 
-    if (checkM == true)
-    {
-        if (user == "2")
-        {
-            mod1 = 1;
-            mod2 = 2;
-            if (tile1 != 1)
-            {
-                mod2 = 0;
-            }
-
-        }
-        else
-        {
-            mod1 = -1;
-            mod2 = -2;
-            if (tile1 != 6)
-            {
-                mod2 = 0;
-            }
-        }
-    }
-
     if (board[tile1 + mod1, tile2].Contains('1') || board[tile1 + mod1, tile2].Contains('2'))
     {
         valid[tile1 + mod1, tile2] = false;
-
     }
     else
     {
@@ -402,7 +377,6 @@ void pawn(int tile1, int tile2)
             valid[tile1 + mod2, tile2] = true;
         }
     }
-
     if (tile2 < 7)
     {
         if (board[tile1 + mod1, tile2 + 1].Contains(opposer))
@@ -417,98 +391,11 @@ void pawn(int tile1, int tile2)
             valid[tile1 + mod1, tile2 - 1] = true;
         }
     }
-
     if (checkM == false)
     {
         possible();
     }
-
 }
-
-void rook(int one, int two)
-{
-    int modN = one, modE = Math.Abs(two - 7), modS = Math.Abs(one - 7), modW = two;
-    for (int i = 1; i <= modN; i++)
-    {
-        if (board[one - i, two].Contains(user))
-        {
-            break;
-        }
-        else if (board[one - i, two].Contains(opposer))
-        {
-            valid[one - i, two] = true;
-            break;
-        }
-        else
-        {
-            valid[one - i, two] = true;
-        }
-
-    }
-    for (int i = 1; i <= modE; i++)
-    {
-
-        if (board[one, two + i].Contains(user))
-        {
-            break;
-        }
-        else if (board[one, two + i].Contains(opposer))
-        {
-            valid[one, two + i] = true;
-            break;
-        }
-        else
-        {
-            valid[one, two + i] = true;
-        }
-
-
-    }
-    for (int i = 1; i <= modS; i++)
-    {
-
-
-        if (board[one + i, two].Contains(user))
-        {
-            break;
-        }
-        else if (board[one + i, two].Contains(opposer))
-        {
-            valid[one + i, two] = true;
-            break;
-        }
-        else
-        {
-            valid[one + i, two] = true;
-        }
-
-    }
-    for (int i = 1; i <= modW; i++)
-    {
-
-
-        if (board[one, two - i].Contains(user))
-        {
-            break;
-        }
-        else if (board[one, two - i].Contains(opposer))
-        {
-            valid[one, two - i] = true;
-            break;
-        }
-        else
-        {
-            valid[one, two - i] = true;
-        }
-
-    }
-    valid[one, two] = false;
-    if (checkM == false && !queen)
-    {
-        possible();
-    }
-}
-
 
 void knight(int one, int two)
 {
@@ -552,6 +439,7 @@ void knight(int one, int two)
     }
 
 }
+
 void check(int one, int two)
 {
     if (board[one, two].Contains(user))
@@ -561,160 +449,79 @@ void check(int one, int two)
     recursion++;
 }
 
-int restD = 0;
-int restR = 0;
-int rest = 0;
-
-int modB1 = 1, modB2 = 1;
-void checkB(int one, int two)
+void UniversalMove(int one, int two, int move1, int move2, int rest) //moving method for rook and bishop
 {
-    
-    int app = 1;
-
-
     for (int i = 1; i <= rest; i++)
     {
-        if (board[one + (i * modB1), two + (i * modB2)].Contains(user))
+        if (board[one + (i * move1), two + (i * move2)].Contains(user))
         {
             break;
         }
-        else if (board[one + (i * modB1), two + (i * modB2)].Contains(opposer))
+        else if (board[one + (i * move1), two + (i * move2)].Contains(opposer))
         {
-            valid[one + (i * modB1), two + (i * modB2)] = true;
+            valid[one + (i * move1), two + (i * move2)] = true;
             break;
         }
         else
         {
-            valid[one + (i * modB1), two + (i * modB2)] = true;
+            valid[one + (i * move1), two + (i * move2)] = true;
         }
     }
 }
 
-
-void bishop(int one, int two) // use a whole check (method) system?
+void Rook(int one, int two)
 {
-    /*
-    int app = 1;
-    switch (app)
+    switch (recursion)
     {
         case 1:
-            
+            UniversalMove(one, two, -1, 0, one);
+            break;
         case 2:
-
+            UniversalMove(one, two, 0, 1, 7 - two);
+            break;
         case 3:
-
+            UniversalMove(one, two, 1, 0, 7 - one);
+            break;
         case 4:
-        
-    } */
-    restD = 7 - one;
-    restR = 7 - two;
-    // use modifiers as multipliers.
-    if (restD > restR)
-    {
-        rest = restR;
-    }
-    else
-    {
-        rest = restD;
-    }
-
-    checkB(one, two);
-
-    for (int i = 1; i <= rest; i++)
-    {
-        if (board[one + i, two + i].Contains(user))
-        {
+            UniversalMove(one, two, 0, -1, two);
             break;
-        }
-        else if (board[one + i, two + i].Contains(opposer))
-        {
-            valid[one + i, two + i] = true;
-            break;
-        }
-        else
-        {
-            valid[one + i, two + i] = true;
-        }
     }
+    if (recursion != 4)
+    {
+        recursion++;
+        Rook(one, two);
+    }
+    recursion = 1;
+    valid[one, two] = false;
+    if (checkM == false && !queen)
+    {
+        possible();
+    }
+}
 
-    if (restD > two)
+void Bishop(int one, int two) 
+{
+    switch (recursion)
     {
-        rest = two;
-    }
-    else
-    {
-        rest = restD;
-    }
-
-    for (int i = 1; i <= rest; i++)
-    {
-        if (board[one + i, two - i].Contains(user))
-        {
+        case 1:
+            UniversalMove(one, two, 1, 1, Math.Min(7 - one, 7 - two));
             break;
-        }
-        else if (board[one + i, two - i].Contains(opposer))
-        {
-            valid[one + i, two - i] = true;
+        case 2:
+            UniversalMove(one, two, 1, -1, Math.Min(7 - one, two));
             break;
-        }
-        else
-        {
-            valid[one + i, two - i] = true;
-        }
-    }
-
-    if (one > two)
-    {
-        rest = two;
-    }
-    else
-    {
-        rest = one;
-    }
-
-    for (int i = 1; i <= rest; i++)
-    {
-        if (board[one - i, two - i].Contains(user))
-        {
+        case 3:
+            UniversalMove(one, two, -1, -1, Math.Min(one, two));
             break;
-        }
-        else if (board[one - i, two - i].Contains(opposer))
-        {
-            valid[one - i, two - i] = true;
+        case 4:
+            UniversalMove(one, two, -1, 1, Math.Min(one, 7 - two));
             break;
-        }
-        else
-        {
-            valid[one - i, two - i] = true;
-        }
     }
-
-    if (one > restR)
+    if (recursion != 4)
     {
-        rest = restR;
+        recursion++;
+        Bishop(one, two);
     }
-    else
-    {
-        rest = one;
-    }
-
-    for (int i = 1; i <= rest; i++)
-    {
-        if (board[one - i, two + i].Contains(user))
-        {
-            break;
-        }
-        else if (board[one - i, two + i].Contains(opposer))
-        {
-            valid[one - i, two + i] = true;
-            break;
-        }
-        else
-        {
-            valid[one - i, two + i] = true;
-        }
-    }
-
+    recursion = 1;
     if (checkM == false && !queen)
     {
         possible();
@@ -782,14 +589,13 @@ void possible()
 
 }
 
-
 ////////////////////////////// GAME //////////////////////////////
 
 //Initialize
 for (int i = 0; i < 16; i++)
 {
     scroll = sr.ReadLine();
-    string[]? boardB = scroll.Split(",");
+    string[] boardB = scroll.Split(",");
     for (int j = 0; j < 8; j++)
     {
         if (i < 8)
@@ -805,6 +611,4 @@ for (int i = 0; i < 16; i++)
 
 //Start ( begin the recursion )
 print();
-
 move(turn());
-
