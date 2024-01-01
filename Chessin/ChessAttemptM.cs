@@ -1,13 +1,11 @@
 ﻿//WIP making chess, I will be working on in this in the near future
 //So, I made it as a repo, and may convert to kotlin
-using System.Data.SqlTypes;
-
 string[,] board = new string[8, 8]; string[,] boardA = new string[8, 8]; // arrays
 string[] letters = { "a", "b", "c", "d", "e", "f", "g", "h" };
 
 const string boardDoc = "board.csv";           //variables for reading "board.csv" values; accessing and reading
-StreamReader sr = new StreamReader(boardDoc);
-string scroll = "";
+StreamReader sr = new(boardDoc);
+string? scroll = "";
 
 bool player = true; //player true; player 1's turn, player false; player 2's turn
 int Phase = 1;  //Whilst phase == 1; character select to move, phase == 0; select to place
@@ -21,18 +19,33 @@ bool[,] valid = new bool[8, 8];
 bool[,] kingValid = new bool[8, 8];
 char opposer = '0';
 
-int rook11, rook12, king1, king2, rook22, rook21; //castling
+
 bool checkM = false;
 string user = "0";
 int mA = 0;
 int mB = 0;
-bool motion = true;
 bool contension = false;
 bool queen = false;
 bool king = false;
 bool phaseCheck = false;
-bool pin = false;
 int temp3 = 0; int temp4 = 0;
+
+//en passent ------------------------ !THIS WILL BE THE HARDEST SYSTEM TO IMPLEMENT! ----------------------------------------------------
+
+// TO DO 
+// en passent, castling, check mate, stalemate, *rework of check available spot mehtod for most pieces.*
+
+//castling ---------------------------------------------------------------------------------------------------------------------------------
+// work on one rook at a time
+// rook can not have moved -> DISTINGUISH BETWEEN ROOKS: 
+// selected tile must contain rook that see's king depending on which side for player tiles adjusted. depending on initial spot.
+// and bool for method caveat
+// king cannot have moved -> bool method caveat
+// king cannot be in check -> method caveat: if your king is in check
+// can't castle through a check -> if tile _ _ _ has one true, no castle 
+// no pieces in between -> rook must see king.
+
+// this will start after some organization.
 
 ////////////////////////////// METHODS //////////////////////////////
 
@@ -56,8 +69,6 @@ void print() //interface
     }
 }
 
-
-
 string turn()
 {
     for (int i = 0; i < 8; i++)
@@ -68,6 +79,7 @@ string turn()
         }
     }
     Phase = 1;
+
     if (player)
     {
         opposer = '1';
@@ -88,8 +100,6 @@ string turn()
         return "2";
     }
 }
-
-
 
 void checkMate()
 {
@@ -124,6 +134,12 @@ void checkMate()
                 bishop(i, j);
             }
 
+            if (board[i, j].Contains("m" + user))
+            {
+                master(i, j);
+                recursion = 1;
+            }
+
             if (board[i, j].Contains("m" + opposer))
             {
                 mA = i; mB = j;
@@ -134,18 +150,11 @@ void checkMate()
 
     if (valid[mA, mB] == true)
     {
-        if (phaseCheck == true)
+        if (phaseCheck == true && Phase == 0) // dont enter on next player's turn
         {
             System.Console.WriteLine("\nYou are still under attack if you go there...");
             contension = false;
             phaseCheck = false;
-            for (int i = 0; i < 8; i++)
-            {
-                for (int j = 0; j < 8; j++)
-                {
-                    valid[i, j] = false;
-                }
-            }
             board[temp, temp2] = board[temp3, temp4];
             board[temp3, temp4] = Replace(temp3, temp4);
             move(turn());
@@ -176,7 +185,7 @@ void move(string who)
 {
     Console.WriteLine();
     Console.WriteLine("\nPlayer " + who + " select who to move. 'a1' for example.");
-    string sel = Console.ReadLine();
+    string? sel = Console.ReadLine();
     spot(sel);
 }
 
@@ -192,7 +201,7 @@ void spot(string here)
             }
         }
     }
-    move(turn()); // if it breaks just go back to while loop continuation. I hope checkmate system works for both
+    move(turn()); // next turn
 }
 
 void Piece(int one, int two)
@@ -220,7 +229,6 @@ void Piece(int one, int two)
         {
             bishop(one, two);
             intermission(one, two);
-
         }
         else if (board[one, two].Contains('q'))
         {
@@ -239,45 +247,11 @@ void Piece(int one, int two)
             intermission(one, two);
         }
     }
-    if (contension && Phase != 3) // runs through again???
+    if (contension)
     {
-
         if (king == false)
         {
-            if (valid[one, two] == true)
-            {
-                for (int i = 0; i < 8; i++)
-                {
-                    for (int j = 0; j < 8; j++)
-                    {
-                        valid[i, j] = false;
-                    }
-                }
-                temp3 = one; temp4 = two;
-                newTemp = board[one, two];
-                board[one, two] = board[temp, temp2];
-                board[temp, temp2] = Replace(temp, temp2);
-                if (user == "1")
-                {
-                    user = "2";
-                    opposer = '1';
-                }
-                else
-                {
-                    user = "1"; opposer = '2';
-                }
-                phaseCheck = true;
-                checkMate();
-                Phase = 1;
-                print();
-                player = !player;
-                king = false;
-            }
-            else
-            {
-                Phase = 1;
-                move(turn());
-            }
+            endTurn(one, two);
         }
         else if (valid[one, two] == true && kingValid[one, two] == true)
         {
@@ -286,77 +260,46 @@ void Piece(int one, int two)
             king = false;
             move(turn());
         }
-
-
     }
     if (Phase == 0 && checkM == false)
     {
-        //one for king movement pin check moving to spot where it should not. check.
-        if (king == true && valid[one, two] == true)
-        {
-            for (int i = 0; i < 8; i++)
-            {
-                for (int j = 0; j < 8; j++)
-                {
-                    valid[i, j] = false;
-                }
-            }
-            temp3 = one; temp4 = two;
-            newTemp = board[one, two];
-            board[one, two] = board[temp, temp2];
-            board[temp, temp2] = Replace(temp, temp2);
-            if (user == "1")
-            {
-                user = "2";
-                opposer = '1';
-            }
-            else
-            {
-                user = "1"; opposer = '2';
-            }
-            phaseCheck = true;
-            checkMate();
-            Phase = 1;
-            print();
-            player = !player;
-            king = false;
-        }
+        endTurn(one, two);
+    }
+}
 
-        // another for other pieces accidentally opening a path.
-        else if (valid[one, two] == true)
+void endTurn(int one, int two)
+{
+    if (valid[one, two] == true)
+    {
+        for (int i = 0; i < 8; i++)
         {
-            for (int i = 0; i < 8; i++)
+            for (int j = 0; j < 8; j++)
             {
-                for (int j = 0; j < 8; j++)
-                {
-                    valid[i, j] = false;
-                }
+                valid[i, j] = false;
             }
-            newTemp = board[one, two];
-            temp3 = one; temp4 = two;
-            board[one, two] = board[temp, temp2];
-            board[temp, temp2] = Replace(temp, temp2);
-            if (user == "1")
-            {
-                user = "2";
-                opposer = '1';
-            }
-            else
-            {
-                user = "1"; opposer = '2';
-            }
-            phaseCheck = true;
-            checkMate();
-            Phase = 1;
-            print();
-            player = !player;
-            king = false;
+        }
+        temp3 = one; temp4 = two;
+        newTemp = board[one, two];
+        board[one, two] = board[temp, temp2];
+        board[temp, temp2] = Replace(temp, temp2);
+        if (user == "1")
+        {
+            user = "2";
+            opposer = '1';
         }
         else
         {
-            Phase = 1;
-            move(turn());
+            user = "1"; opposer = '2';
         }
+        phaseCheck = true;
+        checkMate();
+        print();
+        player = !player;
+        king = false;
+    }
+    else
+    {
+        move(turn());
     }
 }
 
@@ -395,10 +338,10 @@ string Replace(int spot1, int spot2)  //tile replacer.
         }
     }
 }
-
+// PIECES -------------------------------------------------------------------------------------------------------
 void pawn(int tile1, int tile2)
 {
-    int mod1 = 0, mod2 = 0;
+    int mod1, mod2;
     if (player == true)
     {
         mod1 = -1;
@@ -622,11 +565,50 @@ int restD = 0;
 int restR = 0;
 int rest = 0;
 
-void bishop(int one, int two)
+int modB1 = 1, modB2 = 1;
+void checkB(int one, int two)
 {
+    
+    int app = 1;
+
+
+    for (int i = 1; i <= rest; i++)
+    {
+        if (board[one + (i * modB1), two + (i * modB2)].Contains(user))
+        {
+            break;
+        }
+        else if (board[one + (i * modB1), two + (i * modB2)].Contains(opposer))
+        {
+            valid[one + (i * modB1), two + (i * modB2)] = true;
+            break;
+        }
+        else
+        {
+            valid[one + (i * modB1), two + (i * modB2)] = true;
+        }
+    }
+}
+
+
+void bishop(int one, int two) // use a whole check (method) system?
+{
+    /*
+    int app = 1;
+    switch (app)
+    {
+        case 1:
+            
+        case 2:
+
+        case 3:
+
+        case 4:
+        
+    } */
     restD = 7 - one;
     restR = 7 - two;
-
+    // use modifiers as multipliers.
     if (restD > restR)
     {
         rest = restR;
@@ -635,6 +617,8 @@ void bishop(int one, int two)
     {
         rest = restD;
     }
+
+    checkB(one, two);
 
     for (int i = 1; i <= rest; i++)
     {
@@ -805,7 +789,7 @@ void possible()
 for (int i = 0; i < 16; i++)
 {
     scroll = sr.ReadLine();
-    string[] boardB = scroll.Split(",");
+    string[]? boardB = scroll.Split(",");
     for (int j = 0; j < 8; j++)
     {
         if (i < 8)
