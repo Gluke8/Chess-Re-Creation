@@ -1,5 +1,7 @@
 ﻿//WIP making chess, I will be working on in this in the near future
 //So, I made it as a repo, and may convert to kotlin
+using System.Data;
+
 string[,] board = new string[8, 8]; string[,] boardA = new string[8, 8]; // arrays
 string[] letters = { "a", "b", "c", "d", "e", "f", "g", "h" };
 
@@ -30,13 +32,37 @@ bool queen = false;
 bool king = false;
 int temp3 = 0; int temp4 = 0;
 
-//en passent ------------------------ !THIS WILL BE THE HARDEST SYSTEM TO IMPLEMENT! ----------------------------------------------------
+//en passent ----------------------------------------------------------------------------
+int turnCount = 1;
+int mod1 = 0, mod2 = 0;
+int enPassent2 = 1;
+string newPawn = "";
+int newMod = 0;
+bool pawnSelect = false;
+int[,] enPassent = new int[8, 8]; 
 
 // TO DO 
 // en passent, castling, check mate, stalemate,
 
-//castling ---------------------------------------------------------------------------------------------------------------------------------
+//castling -----------------------------  !THIS WILL BE THE HARDEST SYSTEM TO IMPLEMENT!  -----------------------------------------------------
+bool[] castle1 = { true, false, false, false, true, false, false, true }; // bools to castle
+// it is a line // player 1
+bool[] castle2 = { true, false, false, false, true, false, false, true }; // player 2
+// -> on player's turn if the rook ar king moves from its original spot set player's castle form original spot to false
 // work on one rook at a time
+bool activeCastle = false;
+/* 
+if (sel.Contains("C"))
+    { 
+        activeCastle = true;
+    }
+}
+// run in Piece
+// rook
+
+
+
+*/
 // rook can not have moved -> DISTINGUISH BETWEEN ROOKS: 
 //  -> selected tile must contain rook that see's king depending on which side for player tiles adjusted. depending on initial spot.
 //  -> and bool for method caveat
@@ -79,6 +105,9 @@ string turn()
         }
     }
     Phase = 1;
+    recursion = 1;
+    pawnSelect = false;
+    enPassent2 = 1;
 
     if (player)
     {
@@ -156,6 +185,10 @@ void checkMate()
             contension = false;
             board[temp, temp2] = board[temp3, temp4];
             board[temp3, temp4] = Replace(temp3, temp4);
+            if (enPassent2 == 0)
+            {
+                board[temp3 + newMod, temp4] = newPawn;
+            }
             move(turn());
         }
         contension = true; // run sub paths in methods
@@ -185,6 +218,9 @@ void move(string who)
     Console.WriteLine();
     Console.WriteLine("\nPlayer " + who + " select who to move. 'a1' for example.");
     string? sel = Console.ReadLine();
+
+
+
     spot(sel);
 }
 
@@ -209,6 +245,7 @@ void Piece(int one, int two)
     {
         if (board[one, two].Contains('p'))
         {
+            pawnSelect = true; // implement into the king check system true tiles.
             pawn(one, two);
             intermission(one, two);
         }
@@ -216,7 +253,6 @@ void Piece(int one, int two)
         {
             Rook(one, two);
             intermission(one, two);
-
         }
         else if (board[one, two].Contains('k'))
         {
@@ -226,9 +262,7 @@ void Piece(int one, int two)
         }
         else if (board[one, two].Contains('b'))
         {
-            
             Bishop(one, two);
-
             intermission(one, two);
         }
         else if (board[one, two].Contains('q'))
@@ -238,7 +272,6 @@ void Piece(int one, int two)
             Bishop(one, two);
             possible();
             intermission(one, two);
-
         }
         else if (board[one, two].Contains('m'))
         {
@@ -268,10 +301,34 @@ void Piece(int one, int two)
     }
 }
 
+
 void endTurn(int one, int two)
 {
     if (valid[one, two] == true)
     {
+        if (pawnSelect == true)
+        { //might have to move this down in end turn like after checkmate() // might inherently do it: if previous turn occured was a double pawn activate kingValid check with it
+            if ((temp + temp2 + mod2) == (one + two))
+            {
+                enPassent[one, two] = turnCount;
+            }
+
+            if (user == "1")
+            {
+                newMod = 1;
+            }
+            else
+            {
+                newMod = -1;
+            }
+            if (enPassent[one + newMod, two] == (turnCount - 1))
+            {
+                enPassent2 = 0;
+                newPawn = board[one + newMod, two];
+                board[one + newMod, two] = Replace(one + newMod, two);
+            }
+        }
+
         for (int i = 0; i < 8; i++)
         {
             for (int j = 0; j < 8; j++)
@@ -294,6 +351,8 @@ void endTurn(int one, int two)
         }
         checkMate();
         print();
+        turnCount++;
+        System.Console.WriteLine("\nTurn " + turnCount);
         player = !player;
         king = false;
     }
@@ -343,8 +402,9 @@ string Replace(int spot1, int spot2)  //tile replacer.
 
 void pawn(int tile1, int tile2)
 {
-    int mod1, mod2;
-    if (user == "1"){
+
+    if (user == "1") // user 1
+    {
         mod1 = -1;
         mod2 = -2;
         if (tile1 != 6)
@@ -352,7 +412,8 @@ void pawn(int tile1, int tile2)
             mod2 = 0;
         }
     }
-    else {
+    else // user 2
+    {
         mod1 = 1;
         mod2 = 2;
         if (tile1 != 1)
@@ -361,6 +422,7 @@ void pawn(int tile1, int tile2)
         }
     }
 
+    // check for pieces in front.
     if (board[tile1 + mod1, tile2].Contains('1') || board[tile1 + mod1, tile2].Contains('2'))
     {
         valid[tile1 + mod1, tile2] = false;
@@ -368,18 +430,28 @@ void pawn(int tile1, int tile2)
     else
     {
         valid[tile1 + mod1, tile2] = true;
-        if (mod2 == 0)
-        {
-            valid[tile1 + mod2, tile2] = false;
-        }
-        else
-        {
-            valid[tile1 + mod2, tile2] = true;
-        }
     }
+
+    if (mod2 == 0)
+    {
+        valid[tile1 + mod2, tile2] = false;
+    }
+    else if (board[tile1 + mod2, tile2].Contains('1') || board[tile1 + mod2, tile2].Contains('2'))
+    {
+        valid[tile1 + mod2, tile2] = false;
+    }
+    else
+    {
+        valid[tile1 + mod2, tile2] = true;
+    }
+
     if (tile2 < 7)
     {
         if (board[tile1 + mod1, tile2 + 1].Contains(opposer))
+        {
+            valid[tile1 + mod1, tile2 + 1] = true;
+        }
+        if (enPassent[tile1, tile2 + 1] == (turnCount - 1))
         {
             valid[tile1 + mod1, tile2 + 1] = true;
         }
@@ -387,6 +459,10 @@ void pawn(int tile1, int tile2)
     if (tile2 > 0)
     {
         if (board[tile1 + mod1, tile2 - 1].Contains(opposer))
+        {
+            valid[tile1 + mod1, tile2 - 1] = true;
+        }
+        if (enPassent[tile1, tile2 - 1] == (turnCount - 1))
         {
             valid[tile1 + mod1, tile2 - 1] = true;
         }
@@ -499,7 +575,7 @@ void Rook(int one, int two)
     }
 }
 
-void Bishop(int one, int two) 
+void Bishop(int one, int two)
 {
     switch (recursion)
     {
