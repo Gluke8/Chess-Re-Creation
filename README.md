@@ -23,3 +23,46 @@ int[,] enPassent = new int[8, 8]; // new int array set to 0 at every spot. if a 
 // 2. pawn moved beside capturing pawn must have done a 2 move advance. 
 
 // 3. en passent must be done immediatly after the opposer's two tile advance. 
+
+
+
+
+
+
+//castling -----------------------------  !THIS WILL BE THE HARDEST SYSTEM TO IMPLEMENT!  -----------------------------------------------------
+bool rookMove = false;
+int rookTemp = -1;
+
+bool[,] validTemp = new bool[8, 8]; // used in castling
+// it is a line
+bool[] castle2 = { true, false, false, false, true, false, false, true }; // player 2 row
+
+bool[] castle1 = { true, false, false, false, true, false, false, true }; // bools to castle // player 1 row
+// -> on player's turn if the rook ar king moves from its original spot set player's castle form original spot to false
+// work on one rook at a time
+bool activeCastleL = false;
+bool activeCastleR = false;
+/* 
+if (sel.Contains("C"))
+    { 
+        activeCastle = true;
+    }
+}
+// run in Piece
+// rook
+
+
+
+*/
+// rook can not have moved -> DISTINGUISH BETWEEN ROOKS: 
+//  -> selected tile must contain rook that see's king depending on which side for player tiles adjusted. depending on initial spot.
+//  -> and bool for method caveat
+// king cannot have moved -> bool method caveat
+// king cannot be in check -> method caveat: if your king is in check
+// can't castle through a check -> if tiles _ _ _ have one true, no castle 
+// no pieces in between -> rook must see king.
+// Castling 
+// few more tweaks: 
+// cannot castle through a square that is able to be attacked by opponent
+// cannot castle into a check. Leaving castling king in check at the start of the opponents turn
+bool[] castleThrough = { false, false, false, false, false, false, false, false }; 
