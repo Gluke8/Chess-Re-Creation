@@ -41,13 +41,48 @@ string newPawn = "";
 int newMod = 0;
 bool pawnSelect = false;
 int[,] enPassent = new int[8, 8];
+for (int i = 0; i < 8; i++)
+{
+    for (int j = 0; j < 8; j++)
+    {
+        enPassent[i, j] = -1;
+    }
+}
 
 // TO DO 
 // check mate, stalemate,
+// Checkmate (MATE) ---------------------------------------------------------------------------------------
+/*
+1. Since finding if you have any legal moves seems strenuous (code is itterating alot before your turn) it may be easier to implement a forfeit system:
+If your king is under attack, otherwise known as being in check, you have three attempts to end your turn with the king freed from check.
+If this is not fulfilled, the game will end with whomever checked the king.
+
+2. Done simply you may or may not be warned about being in check, rather if your opponent captures your king, you lose.
+
+3. The classic mate is having no legal moves, while your king is in check. 
+So in order to do this every instance of movement for your pieces must occur. Checking if your king is freed from check.
+If this is never broken out of then you lose. 
+
+Pseudo code in steps (3)
+At the beginning of your turn the opponents availale spots to attack are analyzed. If one of the attacking spots is your king square, you are in check.
+So for a checkmate, every possible move you can do must be checked if it is legal. (freeing your king from the check)
+Of course this happens before your turn to move. 
+First analyze a pawn, figure out its valid tiles and try them all, do this in an array for loop, testing if king is now false. 
+No, try that pawns next true etc. 
+
+*/
+bool[,] validMate = new bool[8, 8];
+bool mateMove = false;
+string thisOne = "";
+int safe = 0;
+
+
+
+
+
 bool rookMove = false;
 int rookTemp = -1;
 
-// cannot castle into a check. Leaving castling king in check at the start of the opponents turn
 bool[] castleThrough = { false, false, false, false, false, false, false, false };
 bool startCastle = false;
 int endCastle = 0;
@@ -193,27 +228,32 @@ void checkMate()
             { // is this even needed? the king cannot even castle if one of the squares are checked anyways
                 if (user == "1") // player 2. ******************** might not be needed since you can't castle if one of the tiles are contested ***********
                 {
-                    if(endCastle == 1) {
+                    if (endCastle == 1)
+                    {
                         board[0, 3] = Replace(0, 3);
                         board[0, 2] = Replace(0, 2);
                         board[0, 0] = "r2 ";
                         board[0, 4] = "m2 ";
                     }
-                    else if (endCastle == 2){
+                    else if (endCastle == 2)
+                    {
                         board[0, 5] = Replace(0, 5);
                         board[0, 6] = Replace(0, 6);
                         board[0, 7] = "r2 ";
                         board[0, 4] = "m2 ";
                     }
                 }
-                else{
-                    if(endCastle == 1) {
+                else
+                {
+                    if (endCastle == 1)
+                    {
                         board[7, 3] = Replace(7, 3);
                         board[7, 2] = Replace(7, 2);
                         board[7, 0] = "r1 ";
                         board[7, 4] = "m1 ";
                     }
-                    else if (endCastle == 2){
+                    else if (endCastle == 2)
+                    {
                         board[7, 5] = Replace(7, 5);
                         board[7, 6] = Replace(7, 6);
                         board[7, 7] = "r1 ";
@@ -240,8 +280,15 @@ void checkMate()
             for (int j = 0; j < 8; j++)
             {
                 kingValid[i, j] = valid[i, j];
+                valid[i, j] = false;
             }
         }
+        mate();
+        mateMove = false;
+        // CHECKMATE ----------------------------------------------------------------------------------------------------------------
+        // remember user = 2 while player 1 currently
+        // find all of my pieces.
+
     }
 
     for (int i = 0; i < 8; i++)
@@ -252,6 +299,182 @@ void checkMate()
         }
     }
 
+}
+
+
+
+
+
+
+
+
+
+// could return a bool for active moves
+void mate()
+{
+    mateMove = true;
+    if (user == "2")
+    {
+        user = "1"; opposer = '2';
+    }
+    else
+    {
+        user = "2"; opposer = '1';
+    }
+    for (int i = 0; i < 8; i++)
+    {
+        for (int j = 0; j < 8; j++)
+        {
+            if (board[i, j].Contains("p" + user))
+            {
+                pawn(i, j);
+            }
+            else if (board[i, j].Contains("r" + user))
+            {
+                Rook(i, j);
+            }
+            else if (board[i, j].Contains("k" + user))
+            {
+                knight(i, j);
+                recursion = 1;
+            }
+            else if (board[i, j].Contains("b" + user))
+            {
+                Bishop(i, j);
+            }
+            else if (board[i, j].Contains("q" + user))
+            {
+                Rook(i, j);
+                Bishop(i, j);
+            }
+            for (int x = 0; x < 8; x++)
+            {
+                for (int y = 0; y < 8; y++)
+                {
+                    validMate[x, y] = valid[x, y];
+                    valid[x, y] = false;
+                }
+            }
+            for (int x = 0; x < 8; x++)
+            {
+                for (int y = 0; y < 8; y++)
+                {
+                    if (validMate[x, y] == true)
+                    {
+                        thisOne = board[x, y];
+                        board[x, y] = board[i, j];
+                        board[i, j] = Replace(i, j);
+                        for (int a = 0; a < 8; a++)
+                        {
+                            for (int b = 0; b < 8; b++)
+                            {
+                                if (user == "2")
+                                {
+                                    user = "1"; opposer = '2';
+                                }
+                                else
+                                {
+                                    user = "2"; opposer = '1';
+                                }
+                                if (board[a, b].Contains("p" + user))
+                                {
+                                    pawn(a, b);
+                                }
+                                if (board[a, b].Contains("r" + user))
+                                {
+                                    Rook(a, b);
+                                }
+
+                                if (board[a, b].Contains("k" + user))
+                                {
+                                    knight(a, b);
+                                    recursion = 1;
+                                }
+
+                                if (board[a, b].Contains("q" + user))
+                                {
+                                    Rook(a, b);
+                                    Bishop(a, b);
+                                }
+
+                                if (board[a, b].Contains("b" + user))
+                                {
+                                    Bishop(a, b);
+                                }
+
+                                if (board[a, b].Contains("m" + user))
+                                {
+                                    master(a, b);
+                                    recursion = 1;
+                                }
+
+                                if (board[a, b].Contains("m" + opposer))
+                                {
+                                    mA = a; mB = b;
+                                }
+                                if (user == "2")
+                                {
+                                    user = "1"; opposer = '2';
+                                }
+                                else
+                                {
+                                    user = "2"; opposer = '1';
+                                }
+                            }
+                        }
+                        if (valid[mA, mB] == true)
+                        {
+                            System.Console.WriteLine("WILL NOT PROTECT"); // en passent?? weird replace.
+                            // must replace with original piece there!!!
+                            board[i, j] = board[x, y];
+                            board[x, y] = Replace(x, y);
+                            board[x, y] = thisOne;
+
+                            for (int c = 0; c < 8; c++)
+                            {
+                                for (int d = 0; d < 8; d++)
+                                {
+                                    valid[c, d] = false;
+                                }
+                            }
+
+                        }
+                        else
+                        {
+                            System.Console.WriteLine("WILL PROTECT");
+                            board[i, j] = board[x, y];
+                            board[x, y] = Replace(x, y);
+                            board[x, y] = thisOne;
+                            for (int c = 0; c < 8; c++)
+                            {
+                                for (int d = 0; d < 8; d++)
+                                {
+                                    valid[c, d] = false;
+                                }
+                            }
+                            safe++;
+                        }
+                    }
+                }
+
+            }
+            for (int x = 0; x < 8; x++)
+            {
+                for (int y = 0; y < 8; y++)
+                {
+                    valid[x, y] = false;
+                }
+            }
+
+        }
+    }
+    if (safe == 0){
+        System.Console.WriteLine("Player " + opposer + " wins!");
+        Environment.Exit(0);
+    }
+    else{
+        safe = 0;
+    }
 }
 
 
@@ -756,7 +979,7 @@ void possible()
             reset++;
         }
     }
-    if (reset == 64)
+    if (reset == 64 && mateMove == false)
     {
         Console.WriteLine("No valid moves...");
         queen = false;
@@ -897,21 +1120,22 @@ void Castle()
         user = "1"; opposer = '2';
     }
     for (int i = 0; i < 8; i++) // new
+    {
+        for (int j = 0; j < 8; j++)
         {
-            for (int j = 0; j < 8; j++)
-            {
-                valid[i, j] = false;
-            }
+            valid[i, j] = false;
         }
+    }
     checkMate();
     if (user == "1")
     {
         castle2[0] = false; castle2[4] = false; castle2[7] = false;
     }
-    else {
+    else
+    {
         castle1[0] = false; castle1[4] = false; castle1[7] = false;
     }
-    
+
     print();
     turnCount++;
     System.Console.WriteLine("\nTurn " + turnCount);
