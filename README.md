@@ -66,3 +66,27 @@ if (sel.Contains("C"))
 // cannot castle through a square that is able to be attacked by opponent
 // cannot castle into a check. Leaving castling king in check at the start of the opponents turn
 bool[] castleThrough = { false, false, false, false, false, false, false, false }; 
+// Checkmate (MATE) ---------------------------------------------------------------------------------------
+/*
+1. Since finding if you have any legal moves seems strenuous (code is itterating alot before your turn) it may be easier to implement a forfeit system:
+If your king is under attack, otherwise known as being in check, you have three attempts to end your turn with the king freed from check.
+If this is not fulfilled, the game will end with whomever checked the king.
+
+2. Done simply you may or may not be warned about being in check, rather if your opponent captures your king, you lose.
+
+3. The classic mate is having no legal moves, while your king is in check. 
+So in order to do this every instance of movement for your pieces must occur. Checking if your king is freed from check.
+If this is never broken out of then you lose. 
+
+Pseudo code in steps (3)
+At the beginning of your turn the opponents availale spots to attack are analyzed. If one of the attacking spots is your king square, you are in check.
+So for a checkmate, every possible move you can do must be checked if it is legal. (freeing your king from the check)
+Of course this happens before your turn to move. 
+First analyze a pawn, figure out its valid tiles and try them all, do this in an array for loop, testing if king is now false. 
+No, try that pawns next true etc. 
+
+*/
+bool[,] validMate = new bool[8, 8];
+bool mateMove = false;
+string thisOne = "";
+int safe = 0;
