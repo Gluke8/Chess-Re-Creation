@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Chess-ReCreate")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4a68b05831dd8bb684edcd3a0f20fe73f5ea4797")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
 [assembly: System.Reflection.AssemblyProductAttribute("Chess-ReCreate")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Chess-ReCreate")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

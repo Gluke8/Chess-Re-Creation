@@ -1,7 +1,7 @@
 ﻿//WIP making chess, I will be working on in this in the near future
-//So, I made it as a repo, and may convert to kotlin
-using System.Data;
-using Microsoft.VisualBasic;
+//So, I made it as a repo, and may convert to kotlin,
+
+//UPDATE: PUSHED TO KOTLIN
 
 string[,] board = new string[8, 8]; string[,] boardA = new string[8, 8]; // arrays
 string[] letters = { "a", "b", "c", "d", "e", "f", "g", "h" };
